@@ -144,12 +144,18 @@
 					$scope.keyDown = function(e) {
 						switch(e.which) {
 							case Keys.upArrow:
-								$scope.highlightPrevious();
 								e.preventDefault();
+								if ($scope.showOptions) {
+									$scope.highlightPrevious();
+								}
 								break;
 							case Keys.downArrow:
 								e.preventDefault();
-								$scope.highlightNext();
+								if ($scope.showOptions) {
+									$scope.highlightNext();
+								} else {
+									$scope.showOptions = true;
+								}
 								break;
 							case Keys.enter:
 								e.preventDefault();
