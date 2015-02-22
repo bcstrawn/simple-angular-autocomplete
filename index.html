@@ -95,9 +95,10 @@
 			};
 		})
 
-		myApp.directive('myDirective', function(Keys, $window) {
+		myApp.directive('autocomplete', function(Keys, $window) {
 			return {
 				templateUrl: 'autocomplete.html',
+				restrict: 'E',
 				scope: {
 					options: '=',
 					onSelect: '=',
@@ -124,8 +125,7 @@
 								if (term != $scope.selectedOption[$scope.displayProperty]) {
 									$scope.selectedOption = null;
 								} else {
-									$scope.showOptions = false;
-									$scope.clearHighlight();
+									$scope.closeAndClear();
 									return;
 								}
 							}
@@ -138,8 +138,7 @@
 							$scope.hasMatches = matchingOptions.length > 0;
 							$scope.showOptions = true;
 						} else {
-							$scope.showOptions = false;
-							$scope.clearHighlight();
+							$scope.closeAndClear();
 						}
 					};
 
@@ -173,6 +172,9 @@
 							case Keys.enter:
 								e.preventDefault();
 								$scope.selectOption($scope.highlightedOption);
+								break;
+							case Keys.escape:
+								$scope.closeAndClear();
 								break;
 						}
 					};
@@ -213,6 +215,11 @@
 						$scope.highlightedOption = null;
 					};
 
+					$scope.closeAndClear = function() {
+						$scope.showOptions = false;
+						$scope.clearHighlight();
+					};
+
 					$scope.selectOption = function(option) {
 						console.log('selected the option');
 						$scope.selectedOption = option;
@@ -226,8 +233,7 @@
 					};
 
 					$scope.onBlur = function() {
-						$scope.showOptions = false;
-						$scope.clearHighlight();
+						$scope.closeAndClear();
 					};
 
 					$scope.currentOptionIndex = function() {
@@ -260,19 +266,20 @@
 			return {
 				upArrow: 38,
 				downArrow: 40,
-				enter: 13
+				enter: 13,
+				escape: 27
 			};
 		});
 	</script>
 </head>
 <body ng-app="myApp" ng-controller="TestCtrl" style="padding: 15px;">
 	<div>
-		<div my-directive 
+		<autocomplete 
 		options="datas" 
 		on-select="onDo" 
 		display-property="'title'"
 		input-class="form-control"
-		clear-input="False"></div>
+		clear-input="False"></autocomplete>
 
 		<p>More content</p>
 
