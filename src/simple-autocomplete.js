@@ -49,7 +49,7 @@ angular.module('simple-autocomplete', [])
 				};
 
 				$scope.processSearchTerm = function(term) {
-					console.log('ch-ch-ch-changin');
+					// console.log('ch-ch-ch-changin');
 					if (term.length > 0) {
 						if ($scope.selectedOption) {
 							if (term != $scope.selectedOption[$scope.displayProperty]) {
@@ -156,10 +156,6 @@ angular.module('simple-autocomplete', [])
 					$scope.highlightedOption = option;
 				};
 
-				$scope.onOptionClick = function(option) {
-					console.log('clicking on optin');
-				};
-
 				$scope.$on('simple-autocomplete:clearInput', function() {
 					$scope.searchTerm = '';
 				});
@@ -174,7 +170,7 @@ angular.module('simple-autocomplete', [])
 				};
 
 				$scope.selectOption = function(option) {
-					console.log('selected the option');
+					// console.log('selected the option');
 					$scope.selectedOption = option;
 					$scope.onSelect(option);
 
@@ -200,7 +196,7 @@ angular.module('simple-autocomplete', [])
 				var inputElement = elem.children('.autocomplete-input')[0];
 
 				scope.setOptionWidth = function() {
-					console.log(inputElement.offsetWidth);
+					// console.log(inputElement.offsetWidth);
 					$timeout(function() {
 						var pixelWidth = inputElement.offsetWidth > 400 ? 400 : inputElement.offsetWidth - 2;
 						scope.optionWidth = pixelWidth + 'px';
