@@ -74,9 +74,13 @@ angular.module('simple-autocomplete', [])
 
 				$scope.findMatchingOptions = function(term) {
 					return $scope.options.filter(function(option) {
-						var lowerCaseOption = option[$scope.displayProperty].toLowerCase();
-						var lowerCaseTerm = term.toLowerCase();
-						return lowerCaseOption.indexOf(lowerCaseTerm) != -1;
+						var searchProperty = option[$scope.displayProperty];
+						if (searchProperty) {
+							var lowerCaseOption = searchProperty.toLowerCase();
+							var lowerCaseTerm = term.toLowerCase();
+							return lowerCaseOption.indexOf(lowerCaseTerm) != -1;
+						}
+						return false;
 					});
 				};
 
