@@ -3,7 +3,7 @@
 angular.module('simple-autocomplete', [])
 	.directive('autocomplete', ['autocomplete-keys', '$window', '$timeout', function(Keys, $window, $timeout) {
 		return {
-			template: '<input type="text" class="autocomplete-input"' +
+			template: '<input type="text" class="autocomplete-input" placeholder="{{placeHolder}}"' +
 							'ng-class="inputClass"' +
 							'ng-model="searchTerm"' +
 							'ng-keydown="keyDown($event)"' +
@@ -33,7 +33,8 @@ angular.module('simple-autocomplete', [])
 				onSelect: '=',
 				displayProperty: '=',
 				inputClass: '@',
-				clearInput: '@'
+				clearInput: '@',
+				placeHolder: '@'
 			},
 			controller: function($scope){
 				$scope.searchTerm = '';
