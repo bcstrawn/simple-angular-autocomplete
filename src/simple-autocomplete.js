@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('simple-autocomplete', [])
-	.directive('autocomplete', ['autocomplete-keys', '$window', function(Keys, $window) {
+	.directive('autocomplete', ['autocomplete-keys', '$window', '$timeout', function(Keys, $window, $timeout) {
 		return {
 			template: '<input type="text" class="autocomplete-input"' +
 							'ng-class="inputClass"' +
