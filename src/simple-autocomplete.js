@@ -174,6 +174,8 @@ angular.module('simple-autocomplete', [])
 					} else {
 						$scope.searchTerm = option[$scope.displayProperty];
 					}
+
+					$scope.closeAndClear();
 				};
 
 				$scope.onBlur = function() {
