@@ -4,7 +4,6 @@ This is a very simple autocomplete directive for angular. It only works with loc
 
 It's also very fast on account of being so simple.
 
-Future improvements:
-
-use ng-model on the directive, so using onSelect isn't required
-include an easy way to specify the width of the dropdown
+### Future improvements:
+[ ] use ng-model on the directive, so using onSelect isn't required
+[ ] include an easy way to specify the width of the dropdown
