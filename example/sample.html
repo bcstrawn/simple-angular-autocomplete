@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Sample of Simple Autocomplete</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js"></script>
+	
+	<link rel="stylesheet" href="../src/simple-autocomplete.css">
+	<script type="text/javascript" src="../src/simple-autocomplete.js"></script>
+	<script type="text/javascript" src="sample.js"></script>
+</head>
+
+<body ng-app="sampleApp" ng-controller="SampleCtrl" style="padding: 15px;">
+	<div>
+		<autocomplete  options="datas" 
+						on-select="onSelect" 
+						display-property="'title'"
+						input-class="form-control"
+						clear-input="false"></autocomplete>
+
+		<p>More content</p>
+
+		<p>{{selectedData.title}}</p>
+	</div>
+</body>
+</html>
