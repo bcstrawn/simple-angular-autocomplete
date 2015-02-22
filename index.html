@@ -86,9 +86,12 @@
 				{title: 'The cat', age: 4},
 				{title: 'The bird', age: 7}
 			];
+
+			$scope.selectedData = null;
 			
-			$scope.onDo = function(name) {
-				console.log(name);
+			$scope.onDo = function(data) {
+				console.log(data);
+				$scope.selectedData = data;
 			};
 		})
 
@@ -99,7 +102,8 @@
 					options: '=',
 					onSelect: '=',
 					displayProperty: '=',
-					inputClass: '@'
+					inputClass: '@',
+					clearInput: '@'
 				},
 				controller: function($scope){
 					$scope.searchTerm = '';
@@ -175,7 +179,6 @@
 					
 					$scope.$watch('searchTerm', function(term){
 						$scope.processSearchTerm(term);
-						// $scope.onSelect(term);
 					});
 
 					$scope.highlightNext = function() {
@@ -213,8 +216,13 @@
 					$scope.selectOption = function(option) {
 						console.log('selected the option');
 						$scope.selectedOption = option;
-						$scope.searchTerm = option[$scope.displayProperty];
 						$scope.onSelect(option);
+
+						if ($scope.clearInput != 'False' && $scope.clearInput != 'false') {
+							$scope.searchTerm = '';
+						} else {
+							$scope.searchTerm = option[$scope.displayProperty];
+						}
 					};
 
 					$scope.onBlur = function() {
@@ -228,9 +236,7 @@
 				},
 				link: function(scope, elem, attrs) {
 					scope.optionWidth = 400;
-
 					var inputElement = elem.children('.autocomplete-input')[0];
-					// console.log($(inputElement).css('width'));
 
 					scope.setOptionWidth = function() {
 						console.log(inputElement.offsetWidth);
@@ -241,24 +247,9 @@
 
 					$(document).ready(function() {
 						scope.setOptionWidth();
-						// console.log($(inputElement).css('width'));
 					});
 
-					// var value = $(id).get(0).style.width;
-					/*var inputElementWraper = elem.children('.autocomplete-input-wrapper')[0];
-					var sensor = new ResizeSensor(inputElementWraper, function() {
-						console.log('resize sensor activated');
-						console.log(inputElement.offsetWidth);
-					});*/
-
-					/*scope.$watch(function() {
-						return inputElement.offsetWidth;
-					}, function(newVal) {
-						console.log(newVal);
-					});*/
-
 					angular.element($window).bind('resize', function() {
-		                // console.log(inputElement.offsetWidth);
 		                scope.setOptionWidth();
 		            });
 				}
@@ -280,9 +271,12 @@
 		options="datas" 
 		on-select="onDo" 
 		display-property="'title'"
-		input-class="form-control"></div>
+		input-class="form-control"
+		clear-input="False"></div>
 
 		<p>More content</p>
+
+		<p>{{selectedData.title}}</p>
 	</div>
 
 	<script type="text/ng-template" id="autocomplete.html">
