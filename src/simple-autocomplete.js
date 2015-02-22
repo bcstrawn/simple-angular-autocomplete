@@ -31,7 +31,7 @@ angular.module('simple-autocomplete', [])
 			scope: {
 				options: '=',
 				onSelect: '=',
-				displayProperty: '=',
+				displayProperty: '@',
 				inputClass: '@',
 				clearInput: '@',
 				placeHolder: '@'
