@@ -79,6 +79,14 @@ angular.module('simple-autocomplete', [])
 					});
 				};
 
+				$scope.findExactMatchingOptions = function(term) {
+					return $scope.options.filter(function(option) {
+						var lowerCaseOption = option[$scope.displayProperty].toLowerCase();
+						var lowerCaseTerm = term.toLowerCase();
+						return lowerCaseOption == lowerCaseTerm;
+					});
+				};
+
 				$scope.keyDown = function(e) {
 					switch(e.which) {
 						case Keys.upArrow:
@@ -100,7 +108,14 @@ angular.module('simple-autocomplete', [])
 							break;
 						case Keys.enter:
 							e.preventDefault();
-							$scope.selectOption($scope.highlightedOption);
+							if ($scope.highlightedOption) {
+								$scope.selectOption($scope.highlightedOption);
+							} else {
+								var exactMatches = $scope.findExactMatchingOptions($scope.searchTerm);
+								if (exactMatches[0]) {
+									$scope.selectOption(exactMatches[0]);
+								}
+							}
 							break;
 						case Keys.escape:
 							$scope.closeAndClear();
