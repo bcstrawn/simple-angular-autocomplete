@@ -175,7 +175,7 @@ angular.module('simple-autocomplete', [])
 
 				scope.setOptionWidth = function() {
 					console.log(inputElement.offsetWidth);
-					scope.$apply(function() {
+					$timeout(function() {
 						var pixelWidth = inputElement.offsetWidth > 400 ? 400 : inputElement.offsetWidth - 2;
 						scope.optionWidth = pixelWidth + 'px';
 					});
