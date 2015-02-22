@@ -156,6 +156,10 @@ angular.module('simple-autocomplete', [])
 					console.log('clicking on optin');
 				};
 
+				$scope.$on('simple-autocomplete:clearInput', function() {
+					$scope.searchTerm = '';
+				});
+
 				$scope.clearHighlight = function() {
 					$scope.highlightedOption = null;
 				};

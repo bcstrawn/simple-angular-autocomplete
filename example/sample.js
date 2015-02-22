@@ -10,4 +10,8 @@ angular.module('sampleApp', ['simple-autocomplete']).controller('SampleCtrl', fu
 		console.log(selection);
 		$scope.selectedData = selection;
 	};
+
+	$scope.clearInput = function() {
+		$scope.$broadcast('simple-autocomplete:clearInput');
+	};
 })
