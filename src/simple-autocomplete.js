@@ -2,42 +2,48 @@
 
 angular.module('simple-autocomplete', [])
 	.directive('autocomplete', ['autocomplete-keys', '$window', '$timeout', function(Keys, $window, $timeout) {
+		var template = 
+		'<input type="text" class="autocomplete-input" placeholder="{{placeHolder}}"' +
+			'ng-class="inputClass"' +
+			'ng-model="searchTerm"' +
+			'ng-keydown="keyDown($event)"' +
+			'ng-keypress="keyPress($event)"' +
+			'ng-blur="onBlur()"' +
+            'ng-readonly="ngReadonly" />' +
+
+		'<div class="autocomplete-options-container">' +
+			'<div class="autocomplete-options-dropdown" ng-if="showOptions">' +
+				'<div class="autocomplete-option" ng-if="!hasMatches">' +
+					'<span>No matches</span>' +
+				'</div>' +
+
+				'<ul class="autocomplete-options-list">' +
+					'<li class="autocomplete-option" ng-class="{selected: isOptionSelected(option)}" ' +
+						'ng-style="{width: optionWidth}"' +
+						'ng-repeat="option in matchingOptions"' +
+						'ng-mouseenter="onOptionHover(option)"' +
+						'ng-mousedown="selectOption(option)"' +
+						'ng-if="!noMatches">' +
+						'<span>{{option[displayProperty]}}</span>' +
+					'</li>' +
+				'</ul>' +
+			'</div>' +
+		'</div>';
+
 		return {
-			template: '<input type="text" class="autocomplete-input" placeholder="{{placeHolder}}"' +
-							'ng-class="inputClass"' +
-							'ng-model="searchTerm"' +
-							'ng-keydown="keyDown($event)"' +
-							'ng-blur="onBlur()" />' +
-
-						'<div class="autocomplete-options-container">' +
-							'<div class="autocomplete-options-dropdown" ng-if="showOptions">' +
-								'<div class="autocomplete-option" ng-if="!hasMatches">' +
-									'<span>No matches</span>' +
-								'</div>' +
-
-								'<ul class="autocomplete-options-list">' +
-									'<li class="autocomplete-option" ng-class="{selected: isOptionSelected(option)}" ' +
-										'ng-style="{width: optionWidth}"' +
-										'ng-repeat="option in matchingOptions"' +
-										'ng-mouseenter="onOptionHover(option)"' +
-										'ng-mousedown="selectOption(option)"' +
-										'ng-if="!noMatches">' +
-										'<span>{{option[displayProperty]}}</span>' +
-									'</li>' +
-								'</ul>' +
-							'</div>' +
-						'</div>',
+			template: template,
 			restrict: 'E',
 			scope: {
+				searchTerm: '=?ngModel',
 				options: '=',
 				onSelect: '=',
+				ngReadonly: '=',
 				displayProperty: '@',
 				inputClass: '@',
 				clearInput: '@',
 				placeHolder: '@'
 			},
-			controller: function($scope){
-				$scope.searchTerm = '';
+			controller: function ($scope) {
 				$scope.highlightedOption = null;
 				$scope.showOptions = false;
 				$scope.matchingOptions = [];
@@ -67,12 +73,17 @@ angular.module('simple-autocomplete', [])
 						}
 						$scope.hasMatches = matchingOptions.length > 0;
 						$scope.showOptions = true;
+					    $scope.setOptionWidth();
 					} else {
 						$scope.closeAndClear();
 					}
 				};
 
 				$scope.findMatchingOptions = function(term) {
+					if (!$scope.options) {
+						throw 'You must define a list of options for the autocomplete ' +
+						'or it took too long to load';
+					}
 					return $scope.options.filter(function(option) {
 						var searchProperty = option[$scope.displayProperty];
 						if (searchProperty) {
@@ -87,7 +98,7 @@ angular.module('simple-autocomplete', [])
 				$scope.findExactMatchingOptions = function(term) {
 					return $scope.options.filter(function(option) {
 						var lowerCaseOption = option[$scope.displayProperty].toLowerCase();
-						var lowerCaseTerm = term.toLowerCase();
+						var lowerCaseTerm = term ? term.toLowerCase() : '';
 						return lowerCaseOption == lowerCaseTerm;
 					});
 				};
@@ -111,15 +122,16 @@ angular.module('simple-autocomplete', [])
 								}
 							}
 							break;
-						case Keys.enter:
-							e.preventDefault();
-							if ($scope.highlightedOption) {
-								$scope.selectOption($scope.highlightedOption);
-							} else {
+					    case Keys.enter:
+					        e.preventDefault();
+					    case Keys.tab:
+					        if ($scope.highlightedOption) {
+							    $scope.selectOption($scope.highlightedOption);
+                            } else {
 								var exactMatches = $scope.findExactMatchingOptions($scope.searchTerm);
 								if (exactMatches[0]) {
-									$scope.selectOption(exactMatches[0]);
-								}
+								    $scope.selectOption(exactMatches[0]);
+                                }
 							}
 							break;
 						case Keys.escape:
@@ -127,17 +139,33 @@ angular.module('simple-autocomplete', [])
 							break;
 					}
 				};
-				
-				$scope.$watch('searchTerm', function(term){
-					$scope.processSearchTerm(term);
-				});
+
+				$scope.keyPress = function(e) {
+					switch(e.which) {
+						case Keys.upArrow:
+						case Keys.downArrow:
+					    case Keys.enter:
+						case Keys.escape:
+							break;
+					    default:
+					        $timeout(function() { $scope.processSearchTerm($scope.searchTerm); });
+                            break;
+					}
+				};
+
+			    //$scope.$watch('searchTerm', function(term, oldTerm) {
+			    //    if (term && term !== oldTerm) {
+			    //        $scope.processSearchTerm(term);
+			    //    }
+			    //});
 
 				$scope.highlightNext = function() {
 					if (!$scope.highlightedOption) {
 						$scope.highlightedOption = $scope.matchingOptions[0];
 					} else {
-						var currentIndex = $scope.currentOptionIndex();
-						var nextIndex = currentIndex + 1 == $scope.matchingOptions.length ? 0 : currentIndex + 1;
+						var currentIndex = $scope.getCurrentOptionIndex();
+						var nextIndex = currentIndex + 1 == $scope.matchingOptions.length 
+							? 0 : currentIndex + 1;
 						$scope.highlightedOption = $scope.matchingOptions[nextIndex];
 					}
 				};
@@ -146,8 +174,10 @@ angular.module('simple-autocomplete', [])
 					if (!$scope.highlightedOption) {
 						$scope.highlightedOption = $scope.matchingOptions[$scope.matchingOptions.length - 1];
 					} else {
-						var currentIndex = $scope.currentOptionIndex();
-						var previousIndex = currentIndex == 0 ? $scope.matchingOptions.length - 1 : currentIndex - 1;
+						var currentIndex = $scope.getCurrentOptionIndex();
+						var previousIndex = currentIndex == 0 
+							? $scope.matchingOptions.length - 1 
+							: currentIndex - 1;
 						$scope.highlightedOption = $scope.matchingOptions[previousIndex];
 					}
 				};
@@ -187,7 +217,7 @@ angular.module('simple-autocomplete', [])
 					$scope.closeAndClear();
 				};
 
-				$scope.currentOptionIndex = function() {
+				$scope.getCurrentOptionIndex = function() {
 					return $scope.matchingOptions.indexOf($scope.highlightedOption);
 				};
 			},
@@ -219,6 +249,7 @@ angular.module('simple-autocomplete', [])
 			upArrow: 38,
 			downArrow: 40,
 			enter: 13,
-			escape: 27
+			escape: 27,
+            tab: 9
 		};
 	});
